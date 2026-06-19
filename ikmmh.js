@@ -38,7 +38,7 @@ class Ikm extends ComicSource {
   key = "ikmmh";
   version = "1.0.5";
   minAppVersion = "1.0.0";
-  url = "https://cdn.jsdelivr.net/gh/venera-app/venera-configs@main/ikmmh.js";
+  url = "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/ikmmh.js";
   // 常量定义
   static baseUrl = "https://www.ikmmh.com";
   static Mobile_UA =
