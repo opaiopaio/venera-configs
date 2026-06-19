@@ -14,8 +14,8 @@ class ShonenJumpPlus extends ComicSource {
 
   get headers() {
     return {
-      "Origin": "https://shonenjumpplus.com",
-      "Referer": "https://shonenjumpplus.com/",
+      Origin: "https://shonenjumpplus.com",
+      Referer: "https://shonenjumpplus.com/",
       "X-Giga-Device-Id": this.deviceId,
       "User-Agent": `ShonenJumpPlus-Android/${this.latestVersion}`,
     };
@@ -36,7 +36,9 @@ class ShonenJumpPlus extends ComicSource {
 
     const resp = await Network.get(url);
 
-    const match = resp.body.match(/whats-new__latest__version">[^<]*?([\d.]+)</);
+    const match = resp.body.match(
+      /whats-new__latest__version">[^<]*?([\d.]+)</,
+    );
 
     if (match && match[1]) {
       this.latestVersion = match[1];
@@ -57,36 +59,41 @@ class ShonenJumpPlus extends ComicSource {
         }
 
         const sections = response.data.homeSections;
-        const dailyRankingSection = sections.find((section) =>
-          section.__typename === "DailyRankingSection"
+        const dailyRankingSection = sections.find(
+          (section) => section.__typename === "DailyRankingSection",
         );
 
         if (!dailyRankingSection || !dailyRankingSection.dailyRankings) {
           throw "Cannot fetch daily ranking data";
         }
 
-        const dailyRanking = dailyRankingSection.dailyRankings.find((ranking) =>
-          ranking.ranking && ranking.ranking.__typename === "DailyRanking"
+        const dailyRanking = dailyRankingSection.dailyRankings.find(
+          (ranking) =>
+            ranking.ranking && ranking.ranking.__typename === "DailyRanking",
         );
 
         if (
-          !dailyRanking || !dailyRanking.ranking ||
-          !dailyRanking.ranking.items || !dailyRanking.ranking.items.edges
+          !dailyRanking ||
+          !dailyRanking.ranking ||
+          !dailyRanking.ranking.items ||
+          !dailyRanking.ranking.items.edges
         ) {
           throw "Cannot fetch ranking data structure";
         }
 
-        const rankingItems = dailyRanking.ranking.items.edges.map((edge) =>
-          edge.node
-        ).filter((node) =>
-          node.__typename === "DailyRankingValidItem" && node.product
-        );
+        const rankingItems = dailyRanking.ranking.items.edges
+          .map((edge) => edge.node)
+          .filter(
+            (node) =>
+              node.__typename === "DailyRankingValidItem" && node.product,
+          );
 
         function parseComic(item) {
           const series = item.product.series;
           if (!series) return null;
 
-          const cover = series.squareThumbnailUriTemplate ||
+          const cover =
+            series.squareThumbnailUriTemplate ||
             series.horizontalThumbnailUriTemplate;
 
           return {
@@ -102,9 +109,9 @@ class ShonenJumpPlus extends ComicSource {
           };
         }
 
-        const comics = rankingItems.map(parseComic).filter((comic) =>
-          comic !== null
-        );
+        const comics = rankingItems
+          .map(parseComic)
+          .filter((comic) => comic !== null);
 
         const result = {};
         result["Daily Ranking"] = comics;
@@ -127,34 +134,36 @@ class ShonenJumpPlus extends ComicSource {
       const edges = response?.data?.search?.edges || [];
       const pageInfo = response?.data?.search?.pageInfo || {};
 
-      const comics = edges.map(({ node }) => {
-        const authors = (node.author?.name || "").split(/\s*\/\s*/).filter(
-          Boolean,
-        );
-        const cover = node.latestIssue?.thumbnailUriTemplate ||
-          node.thumbnailUriTemplate;
-        if (node.__typename === "Series") {
-          return new Comic({
-            id: node.databaseId,
-            title: node.title || "",
-            cover: this.replaceCoverUrl(cover),
-            description: node.description || "",
-            tags: authors,
-          });
-        }
-        if (node.__typename === "MagazineLabel") {
-          return new Comic({
-            id: node.databaseId,
-            title: node.title || "",
-            cover: this.replaceCoverUrl(cover),
-          });
-        }
-        return null;
-      }).filter(Boolean);
+      const comics = edges
+        .map(({ node }) => {
+          const authors = (node.author?.name || "")
+            .split(/\s*\/\s*/)
+            .filter(Boolean);
+          const cover =
+            node.latestIssue?.thumbnailUriTemplate || node.thumbnailUriTemplate;
+          if (node.__typename === "Series") {
+            return new Comic({
+              id: node.databaseId,
+              title: node.title || "",
+              cover: this.replaceCoverUrl(cover),
+              description: node.description || "",
+              tags: authors,
+            });
+          }
+          if (node.__typename === "MagazineLabel") {
+            return new Comic({
+              id: node.databaseId,
+              title: node.title || "",
+              cover: this.replaceCoverUrl(cover),
+            });
+          }
+          return null;
+        })
+        .filter(Boolean);
 
       return {
         comics,
-        maxPage: pageInfo.hasNextPage ? (page || 1) + 1 : (page || 1),
+        maxPage: pageInfo.hasNextPage ? (page || 1) + 1 : page || 1,
         endCursor: pageInfo.endCursor,
       };
     },
@@ -180,13 +189,14 @@ class ShonenJumpPlus extends ComicSource {
         { chapters: {}, latestPublishAt: "" },
       );
 
-      const maxDate = latestPublishAt > seriesData.openAt
-        ? latestPublishAt
-        : seriesData.openAt;
+      const maxDate =
+        latestPublishAt > seriesData.openAt
+          ? latestPublishAt
+          : seriesData.openAt;
       const updateDate = new Date(new Date(maxDate) - 60 * 60 * 1000);
-      const authors = (seriesData.author?.name || "").split(/\s*\/\s*/).filter(
-        Boolean,
-      );
+      const authors = (seriesData.author?.name || "")
+        .split(/\s*\/\s*/)
+        .filter(Boolean);
 
       return new ComicDetails({
         title: seriesData.title || "",
@@ -194,8 +204,8 @@ class ShonenJumpPlus extends ComicSource {
         cover: this.replaceCoverUrl(seriesData.thumbnailUriTemplate),
         description: seriesData.description || "",
         tags: {
-          "Author": authors,
-          "Update": [updateDate.toISOString().slice(0, 10)],
+          Author: authors,
+          Update: [updateDate.toISOString().slice(0, 10)],
         },
         url: `https://shonenjumpplus.com/app/episode/${seriesData.publisherId}`,
         chapters,
@@ -251,8 +261,8 @@ class ShonenJumpPlus extends ComicSource {
       `${this.apiBase}/graphql?opname=${operationName}`,
       {
         ...this.headers,
-        "Authorization": `Bearer ${this.bearerToken}`,
-        "Accept": "application/json",
+        Authorization: `Bearer ${this.bearerToken}`,
+        Accept: "application/json",
         "X-APOLLO-OPERATION-NAME": operationName,
         "Content-Type": "application/json",
       },
@@ -272,10 +282,9 @@ class ShonenJumpPlus extends ComicSource {
   }
 
   replaceCoverUrl(url) {
-    return (url || "").replace("{height}", "1500").replace(
-      "{width}",
-      "1500",
-    ) || "";
+    return (
+      (url || "").replace("{height}", "1500").replace("{width}", "1500") || ""
+    );
   }
 
   async fetchBearerToken() {
@@ -284,9 +293,7 @@ class ShonenJumpPlus extends ComicSource {
       this.headers,
       "",
     );
-    const { access_token, user_account_id } = JSON.parse(
-      response.body,
-    );
+    const { access_token, user_account_id } = JSON.parse(response.body);
     this.bearerToken = access_token;
     this.userAccountId = user_account_id;
     this.tokenExpiry = Date.now() + 3600000;
@@ -298,12 +305,14 @@ class ShonenJumpPlus extends ComicSource {
   }
 
   async fetchEpisodes(id) {
-    const response = await this.graphqlRequest(
-      "SeriesDetailEpisodeList",
-      { id, episodeOffset: 0, episodeFirst: 1500, episodeSort: "NUMBER_ASC" },
-    );
+    const response = await this.graphqlRequest("SeriesDetailEpisodeList", {
+      id,
+      episodeOffset: 0,
+      episodeFirst: 1500,
+      episodeSort: "NUMBER_ASC",
+    });
     const episodes = (response?.data?.series?.episodes?.edges || []).map(
-      (edge) => edge.node
+      (edge) => edge.node,
     );
     return episodes;
   }
@@ -317,21 +326,25 @@ class ShonenJumpPlus extends ComicSource {
   }
 
   isEpisodeAccessible({ purchaseInfo }) {
-    return purchaseInfo?.isFree || purchaseInfo?.hasPurchased ||
-      purchaseInfo?.hasRented;
+    return (
+      purchaseInfo?.isFree ||
+      purchaseInfo?.hasPurchased ||
+      purchaseInfo?.hasRented
+    );
   }
 
   async handleEpisodePurchase(episodeData) {
     const { id, purchaseInfo } = episodeData;
-    const { purchasableViaOnetimeFree, rentable, unitPrice } = purchaseInfo ||
-      {};
+    const { purchasableViaOnetimeFree, rentable, unitPrice } =
+      purchaseInfo || {};
 
     if (purchasableViaOnetimeFree) await this.consumeOnetimeFree(id);
     if (rentable) await this.rentChapter(id, unitPrice);
   }
 
   buildImageUrls({ pageImages, pageImageToken }) {
-    const validImages = pageImages.edges.flatMap((edge) => edge.node?.src)
+    const validImages = pageImages.edges
+      .flatMap((edge) => edge.node?.src)
       .filter(Boolean);
     return {
       images: validImages.map((url) => `${url}?token=${pageImageToken}`),
@@ -383,7 +396,7 @@ class ShonenJumpPlus extends ComicSource {
 }
 
 const GraphQLQueries = {
-  "SearchResult": `query SearchResult($after: String, $keyword: String!) {
+  SearchResult: `query SearchResult($after: String, $keyword: String!) {
         search(after: $after, first: 50, keyword: $keyword, types: [SERIES,MAGAZINE_LABEL]) {
             pageInfo { hasNextPage endCursor }
             edges {
@@ -395,7 +408,7 @@ const GraphQLQueries = {
             }
         }
     }`,
-  "SeriesDetail": `query SeriesDetail($id: String!) {
+  SeriesDetail: `query SeriesDetail($id: String!) {
         series(databaseId: $id) {
             id databaseId title thumbnailUriTemplate
             author { name }
@@ -405,16 +418,14 @@ const GraphQLQueries = {
             publisherId
         }
     }`,
-  "SeriesDetailEpisodeList":
-    `query SeriesDetailEpisodeList($id: String!, $episodeOffset: Int, $episodeFirst: Int, $episodeSort: ReadableProductSorting) {
+  SeriesDetailEpisodeList: `query SeriesDetailEpisodeList($id: String!, $episodeOffset: Int, $episodeFirst: Int, $episodeSort: ReadableProductSorting) {
         series(databaseId: $id) {
             episodes: readableProducts(types: [EPISODE], first: $episodeFirst, offset: $episodeOffset, sort: $episodeSort) {
                 edges { node { databaseId title publishedAt } }
             }
         }
     }`,
-  "EpisodeViewerConditionallyCacheable":
-    `query EpisodeViewerConditionallyCacheable($episodeID: String!) {
+  EpisodeViewerConditionallyCacheable: `query EpisodeViewerConditionallyCacheable($episodeID: String!) {
         episode(databaseId: $episodeID) {
             id pageImages { edges { node { src } } } pageImageToken
             purchaseInfo {
@@ -423,19 +434,18 @@ const GraphQLQueries = {
             }
         }
     }`,
-  "ConsumeOnetimeFree":
-    `mutation ConsumeOnetimeFree($input: ConsumeOnetimeFreeInput!) {
+  ConsumeOnetimeFree: `mutation ConsumeOnetimeFree($input: ConsumeOnetimeFreeInput!) {
         consumeOnetimeFree(input: $input) { isSuccess }
     }`,
-  "Rent": `mutation Rent($input: RentInput!) {
+  Rent: `mutation Rent($input: RentInput!) {
         rent(input: $input) {
             userAccount { databaseId }
         }
     }`,
-  "AddUserDevice": `mutation AddUserDevice($input: AddUserDeviceInput!) {
+  AddUserDevice: `mutation AddUserDevice($input: AddUserDeviceInput!) {
         addUserDevice(input: $input) { isSuccess }
     }`,
-  "HomeCacheable": `query HomeCacheable {
+  HomeCacheable: `query HomeCacheable {
     homeSections {
       __typename
       ...DailyRankingSection

@@ -11,7 +11,7 @@ class Zaimanhua extends ComicSource {
   init() {
     this.headers = {
       "User-Agent": "Mozilla/5.0 (Linux; Android) Mobile",
-      "authorization": `Bearer ${this.loadData("token") || ""}`,
+      authorization: `Bearer ${this.loadData("token") || ""}`,
     };
   }
   // 构建 URL
@@ -32,7 +32,10 @@ class Zaimanhua extends ComicSource {
     if (lastSign == newTime) {
       return;
     }
-    const res = await Network.post("https://i.zaimanhua.com/lpi/v1/task/sign_in", this.headers);
+    const res = await Network.post(
+      "https://i.zaimanhua.com/lpi/v1/task/sign_in",
+      this.headers,
+    );
     if (res.status !== 200) {
       return;
     }
@@ -47,12 +50,12 @@ class Zaimanhua extends ComicSource {
     login: async (username, password) => {
       try {
         const encryptedPwd = Convert.hexEncode(
-          Convert.md5(Convert.encodeUtf8(password))
+          Convert.md5(Convert.encodeUtf8(password)),
         );
         const res = await Network.post(
           "https://account-api.zaimanhua.com/v1/login/passwd",
           { "Content-Type": "application/x-www-form-urlencoded;charset=utf-8" },
-          `username=${username}&passwd=${encryptedPwd}`
+          `username=${username}&passwd=${encryptedPwd}`,
         );
 
         const data = JSON.parse(res.body);
@@ -116,7 +119,7 @@ class Zaimanhua extends ComicSource {
       load: async (page) => {
         const res = await Network.get(
           this.buildUrl(`comic/update/list/0/${page}`),
-          this.headers
+          this.headers,
         );
         const data = JSON.parse(res.body).data;
         return {
@@ -127,57 +130,57 @@ class Zaimanhua extends ComicSource {
   ];
 
   static categoryParamMap = {
-    "全部": "0",
-    "冒险": "4",
-    "欢乐向": "5",
-    "格斗": "6",
-    "科幻": "7",
-    "爱情": "8",
-    "侦探": "9",
-    "竞技": "10",
-    "魔法": "11",
-    "神鬼": "12",
-    "校园": "13",
-    "惊悚": "14",
-    "其他": "16",
-    "四格": "17",
-    "亲情": "3242",
-    "百合": "3243",
-    "秀吉": "3244",
-    "悬疑": "3245",
-    "纯爱": "3246",
-    "热血": "3248",
-    "泛爱": "3249",
-    "历史": "3250",
-    "战争": "3251",
-    "萌系": "3252",
-    "宅系": "3253",
-    "治愈": "3254",
-    "励志": "3255",
-    "武侠": "3324",
-    "机战": "3325",
-    "音乐舞蹈": "3326",
-    "美食": "3327",
-    "职场": "3328",
-    "西方魔幻": "3365",
-    "高清单行": "4459",
-    "TS": "4518",
-    "东方": "5077",
-    "魔幻": "5806",
-    "奇幻": "5848",
-    "节操": "6219",
-    "轻小说": "6316",
-    "颜艺": "6437",
-    "搞笑": "7568",
-    "仙侠": "23388",
-    "舰娘": "7900",
-    "动画": "13627",
-    "AA": "17192",
-    "福瑞": "18522",
-    "生存": "23323",
-    "日常": "23388",
-    "画集": "30788",
-    "C100": "31137",
+    全部: "0",
+    冒险: "4",
+    欢乐向: "5",
+    格斗: "6",
+    科幻: "7",
+    爱情: "8",
+    侦探: "9",
+    竞技: "10",
+    魔法: "11",
+    神鬼: "12",
+    校园: "13",
+    惊悚: "14",
+    其他: "16",
+    四格: "17",
+    亲情: "3242",
+    百合: "3243",
+    秀吉: "3244",
+    悬疑: "3245",
+    纯爱: "3246",
+    热血: "3248",
+    泛爱: "3249",
+    历史: "3250",
+    战争: "3251",
+    萌系: "3252",
+    宅系: "3253",
+    治愈: "3254",
+    励志: "3255",
+    武侠: "3324",
+    机战: "3325",
+    音乐舞蹈: "3326",
+    美食: "3327",
+    职场: "3328",
+    西方魔幻: "3365",
+    高清单行: "4459",
+    TS: "4518",
+    东方: "5077",
+    魔幻: "5806",
+    奇幻: "5848",
+    节操: "6219",
+    轻小说: "6316",
+    颜艺: "6437",
+    搞笑: "7568",
+    仙侠: "23388",
+    舰娘: "7900",
+    动画: "13627",
+    AA: "17192",
+    福瑞: "18522",
+    生存: "23323",
+    日常: "23388",
+    画集: "30788",
+    C100: "31137",
   };
 
   //分类页面
@@ -207,13 +210,13 @@ class Zaimanhua extends ComicSource {
       if (category.includes("排行")) {
         let res = await Network.get(
           this.buildUrl(
-            `comic/rank/list?page=${page}&rank_type=${options}&by_time=${param}`
+            `comic/rank/list?page=${page}&rank_type=${options}&by_time=${param}`,
           ),
-          this.headers
+          this.headers,
         );
         return {
           comics: JSON.parse(res.body).data.map((item) =>
-            this.parseComic(item)
+            this.parseComic(item),
           ),
           maxPage: 10,
         };
@@ -221,9 +224,9 @@ class Zaimanhua extends ComicSource {
         param = Zaimanhua.categoryParamMap[category] || "0";
         let res = await Network.get(
           this.buildUrl(
-            `comic/filter/list?status=${options[2]}&theme=${param}&zone=${options[3]}&cate=${options[1]}&sortType=${options[0]}&page=${page}&size=20`
+            `comic/filter/list?status=${options[2]}&theme=${param}&zone=${options[3]}&cate=${options[1]}&sortType=${options[0]}&page=${page}&size=20`,
           ),
-          this.headers
+          this.headers,
         );
         const data = JSON.parse(res.body).data;
         return {
@@ -281,10 +284,10 @@ class Zaimanhua extends ComicSource {
       const res = await Network.get(
         this.buildUrl(
           `search/index?keyword=${encodeURIComponent(
-            keyword
-          )}&page=${page}&sort=0&size=20`
+            keyword,
+          )}&page=${page}&sort=0&size=20`,
         ),
-        this.headers
+        this.headers,
       );
       const data = JSON.parse(res.body).data.list;
       return {
@@ -301,7 +304,7 @@ class Zaimanhua extends ComicSource {
       const path = isAdding ? "add" : "del";
       const res = await Network.get(
         this.buildUrl(`comic/sub/${path}?comic_id=${comicId}`),
-        this.headers
+        this.headers,
       );
       const data = JSON.parse(res.body);
       if (data.errno !== 0) {
@@ -313,7 +316,7 @@ class Zaimanhua extends ComicSource {
       try {
         const res = await Network.get(
           this.buildUrl(`comic/sub/list?status=0&page=${page}&size=20`),
-          this.headers
+          this.headers,
         );
         const data = JSON.parse(res.body).data;
         return {
@@ -339,7 +342,7 @@ class Zaimanhua extends ComicSource {
       const getFavoriteStatus = async (id) => {
         let res = await Network.get(
           this.buildUrl(`comic/sub/checkIsSub?objId=${id}&source=1`),
-          this.headers
+          this.headers,
         );
         this.checkResponseStatus(res);
         return JSON.parse(res.body).data.isSub;
@@ -347,7 +350,7 @@ class Zaimanhua extends ComicSource {
       let results = await Promise.all([
         Network.get(
           this.buildUrl(`comic/detail/${id}?channel=android`),
-          this.headers
+          this.headers,
         ),
         getFavoriteStatus.bind(this)(id),
       ]);
@@ -364,7 +367,7 @@ class Zaimanhua extends ComicSource {
               String(ch.chapter_id),
               `${ch.chapter_title.replace(
                 /^(?:连载版?)?(\d+\.?\d*)([话卷])?$/,
-                (_, n, t) => `第${n}${t || "话"}`
+                (_, n, t) => `第${n}${t || "话"}`,
               )}`,
             ]);
           result.set(groupTitle, new Map(chapters));
@@ -379,9 +382,9 @@ class Zaimanhua extends ComicSource {
         cover: data.cover,
         description: data.description,
         tags: {
-          "作者": tagMapper(authors),
-          "状态": [...tagMapper(status), data.last_update_chapter_name],
-          "标签": tagMapper(types),
+          作者: tagMapper(authors),
+          状态: [...tagMapper(status), data.last_update_chapter_name],
+          标签: tagMapper(types),
         },
         updateTime: this.formatTimestamp(data.last_updatetime),
         chapters: processChapters(data.chapters),
@@ -392,19 +395,19 @@ class Zaimanhua extends ComicSource {
     loadEp: async (comicId, epId) => {
       const res = await Network.get(
         this.buildUrl(`comic/chapter/${comicId}/${epId}`),
-        this.headers
+        this.headers,
       );
       const data = JSON.parse(res.body).data.data;
       return { images: data.page_url_hd || data.page_url };
     },
-    
+
     loadComments: async (comicId, subId, page, replyTo) => {
       try {
         // 构建请求URL
         const url = this.buildUrl(
           `comment/list?page=${page}&size=30&type=4&objId=${
             subId || comicId
-          }&sortBy=1`
+          }&sortBy=1`,
         );
         const res = await Network.get(url, this.headers);
         this.checkResponseStatus(res);
@@ -434,13 +437,13 @@ class Zaimanhua extends ComicSource {
         const processComments = () => {
           // 去重并验证ID有效性
           const validIds = [...new Set(allCommentIds)].filter((id) =>
-            data.commentList.hasOwnProperty(id)
+            data.commentList.hasOwnProperty(id),
           );
 
           // 过滤回复评论
           const filteredIds = replyTo
             ? validIds.filter(
-                (id) => data.commentList[id]?.to_comment_id == replyTo
+                (id) => data.commentList[id]?.to_comment_id == replyTo,
               )
             : validIds;
 
@@ -476,7 +479,7 @@ class Zaimanhua extends ComicSource {
         return { comments: [], maxPage: 0 };
       }
     },
-  
+
     // 发送评论, 返回任意值表示成功.
     sendComment: async (comicId, subId, content, replyTo) => {
       if (!replyTo) {
@@ -489,8 +492,8 @@ class Zaimanhua extends ComicSource {
           "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
         },
         `obj_id=${subId}&content=${encodeURIComponent(
-          content
-        )}&to_comment_id=${replyTo}&type=4`
+          content,
+        )}&to_comment_id=${replyTo}&type=4`,
       );
       this.checkResponseStatus(res);
       let response = JSON.parse(res.body);
@@ -505,7 +508,7 @@ class Zaimanhua extends ComicSource {
           ...this.headers,
           "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
         },
-        `commentId=${commentId}&type=4`
+        `commentId=${commentId}&type=4`,
       );
       this.checkResponseStatus(res);
       return "ok";
@@ -516,7 +519,7 @@ class Zaimanhua extends ComicSource {
     signTask: {
       title: "每日签到",
       type: "switch",
-      default: false
-    }
+      default: false,
+    },
   };
 }

@@ -62,14 +62,14 @@ function parseComicCard(card) {
     const catButtons = card.querySelectorAll('a[href^="/cat/"] button');
     let tags = [];
     if (catButtons.length) {
-        tags = Array.from(catButtons).map((b) => b.text.trim());
+      tags = Array.from(catButtons).map((b) => b.text.trim());
     } else {
-    // 有些结构是 a[href^="/cat/..."] 包着文字
-    const catAnchors = card.querySelectorAll('a[href^="/cat/"]');
-    tags = Array.from(catAnchors)
-    .map((a) => a.text.trim())
-    .filter(Boolean);
-}   
+      // 有些结构是 a[href^="/cat/..."] 包着文字
+      const catAnchors = card.querySelectorAll('a[href^="/cat/"]');
+      tags = Array.from(catAnchors)
+        .map((a) => a.text.trim())
+        .filter(Boolean);
+    }
 
     // 最后更新
     const dateEl = card.querySelector("p.comic-date");
@@ -112,7 +112,7 @@ function parseMaxPage(doc) {
  */
 function parseComicList(doc) {
   const cards = doc.querySelectorAll(
-    'div.row.col-lg-4.col-md-6.col-xs-12, div.row.col-md-6.col-xs-12'
+    "div.row.col-lg-4.col-md-6.col-xs-12, div.row.col-md-6.col-xs-12",
   );
   const result = [];
   cards.forEach((card) => {
@@ -129,8 +129,7 @@ class JComic extends ComicSource {
   version = "1.0.0";
   minAppVersion = "1.4.6";
 
-  url =
-    "https://cdn.jsdelivr.net/gh/venera-app/venera-configs@main/jcomic.js";
+  url = "https://cdn.jsdelivr.net/gh/venera-app/venera-configs@main/jcomic.js";
 
   currentComic = null;
 
@@ -264,7 +263,7 @@ class JComic extends ComicSource {
   categoryComics = {
     /**
      * @param category {string}
-     * @param param {string} 
+     * @param param {string}
      * @param options {string[]}
      * @param page {number}
      */
@@ -301,7 +300,8 @@ class JComic extends ComicSource {
         return { comics: [], maxPage: 1 };
       }
       const encoded = encodeURIComponent(kw);
-      const path = page === 1 ? `/search/${encoded}` : `/search/${encoded}/${page}`;
+      const path =
+        page === 1 ? `/search/${encoded}` : `/search/${encoded}/${page}`;
       const url = this._buildUrl(path);
 
       const resp = await Network.get(url, { referer: JCOMIC_REFERER });
@@ -340,9 +340,7 @@ class JComic extends ComicSource {
 
       const doc = new HtmlDocument(resp.body);
 
-      const infoBlock = doc.querySelector(
-        'div.row.col-md-6.col-xs-12'
-      );
+      const infoBlock = doc.querySelector("div.row.col-md-6.col-xs-12");
       if (!infoBlock) {
         throw new Error("failed to parse comic info");
       }
@@ -363,7 +361,7 @@ class JComic extends ComicSource {
 
       // 作者
       const authorButtons = infoBlock.querySelectorAll(
-        'a[href^="/author/"] button'
+        'a[href^="/author/"] button',
       );
       const authors = Array.from(authorButtons).map((b) => b.text.trim());
 
@@ -378,7 +376,7 @@ class JComic extends ComicSource {
       // 章节列表
       const allPageLinks = doc.querySelectorAll('a[href^="/page/"]');
       let eps = [];
-      
+
       allPageLinks.forEach((a) => {
         const href = a.attributes["href"];
         // 检查这个链接是否属于当前漫画
@@ -476,7 +474,7 @@ class JComic extends ComicSource {
     },
 
     onClickTag: (namespace, tag) => {
-      const keyword = tag; 
+      const keyword = tag;
       return {
         page: "category",
         attributes: {
@@ -489,7 +487,8 @@ class JComic extends ComicSource {
     link: {
       domains: ["jcomic.net"],
       linkToId: (url) => {
-        const reg = /https?:\/\/jcomic\.net\/(?:eps|page)\/([^\/?#]+)(?:\/[^\/?#]+)?/;
+        const reg =
+          /https?:\/\/jcomic\.net\/(?:eps|page)\/([^\/?#]+)(?:\/[^\/?#]+)?/;
         const m = reg.exec(url);
         if (!m) throw new Error("Invalid jcomic url");
         return decodeURIComponent(m[1]);

@@ -119,7 +119,7 @@ function getUint64(view, byteOffset, littleEndian = false) {
 
   if (!Number.isSafeInteger(combined)) {
     console.warn(
-      `${combined} exceeds MAX_SAFE_INTEGER – precision may be lost`
+      `${combined} exceeds MAX_SAFE_INTEGER – precision may be lost`,
     );
   }
   return combined;
@@ -232,14 +232,14 @@ async function get_galleryids_from_data(data) {
 
   if (number_of_galleryids > 10000000 || number_of_galleryids <= 0) {
     throw new Error(
-      "number_of_galleryids " + number_of_galleryids + " is too long"
+      "number_of_galleryids " + number_of_galleryids + " is too long",
     );
   } else if (inbuf.byteLength !== expected_length) {
     throw new Error(
       "inbuf.byteLength " +
         inbuf.byteLength +
         " !== expected_length " +
-        expected_length
+        expected_length,
     );
   }
 
@@ -303,7 +303,7 @@ async function B_search(field, key, node) {
   //it's in a subnode
   const subnode = await get_node_at_address(
     field,
-    node.subnode_addresses[where]
+    node.subnode_addresses[where],
   );
   return await B_search(field, key, subnode);
 }
@@ -340,7 +340,7 @@ function nozomi_address_from_state(state, with_prefix) {
         "/" +
         (with_prefix ? compressed_nozomi_prefix + "/" : "") +
         [state.orderby, [state.orderbykey, state.language].join("-")].join(
-          "/"
+          "/",
         ) +
         nozomiextension
       );
@@ -402,14 +402,14 @@ async function get_galleryids_and_count({ range, state }) {
   const resp = await Network.fetchBytes(
     "GET",
     nozomi_address_from_state(state, false),
-    headers
+    headers,
   );
   if (resp.status !== 200 && resp.status !== 206) {
     throw `failed fetch: ${resp.status}`;
   }
   let itemCount = 0;
   const temp = parseInt(
-    resp.headers["content-range"]?.replace(/^[Bb]ytes \d+-\d+\//, "")
+    resp.headers["content-range"]?.replace(/^[Bb]ytes \d+-\d+\//, ""),
   );
   if (!isNaN(temp) && temp > 0) {
     itemCount = temp / 4;
@@ -463,7 +463,7 @@ async function get_image_srcs(files) {
     "https://" + domain + "/" + "gg.js?_=" + new Date().getTime(),
     {
       referer: refererUrl,
-    }
+    },
   );
   if (resp.status >= 400) {
     throw new Error(resp.status);
@@ -504,7 +504,7 @@ async function get_image_srcs(files) {
   const url_from_url = (url, base, dir) => {
     return url.replace(
       /\/\/..?\.(?:gold-usergeneratedcontent\.net|hitomi\.la)\//,
-      "//" + subdomain_from_url(url, base, dir) + "." + domain2 + "/"
+      "//" + subdomain_from_url(url, base, dir) + "." + domain2 + "/",
     );
   };
 
@@ -519,7 +519,7 @@ async function get_image_srcs(files) {
           real_full_path_from_hash(image.hash) +
           "." +
           ext,
-        base
+        base,
       );
     }
     return url_from_url(url_from_hash(galleryid, image, dir, ext), base, dir);
@@ -567,7 +567,7 @@ function get_thumbnail_url_from_hash(hash, bigTn) {
     "/" +
     `${bigTn ? "avifbigtn" : "avifsmalltn"}/${hash.slice(-1)}/${hash.slice(
       -3,
-      -1
+      -1,
     )}/${hash}.avif`
   );
 }
@@ -575,7 +575,7 @@ function get_thumbnail_url_from_hash(hash, bigTn) {
 async function get_gallery_detail(gid) {
   const resp = await Network.get(
     "https://" + domain + "/" + `galleries/${gid}.js`,
-    { referer: refererUrl }
+    { referer: refererUrl },
   );
   if (resp.status !== 200) {
     throw new Error(resp.status);
@@ -689,8 +689,8 @@ async function multiTagSearch(options) {
           n.namespace === "female"
             ? "female:" + n.value
             : n.namespace === "male"
-            ? "male:" + n.value
-            : n.value,
+              ? "male:" + n.value
+              : n.value,
         language: "all",
         orderby: options.orderby,
         orderbykey: options.orderbykey,
@@ -771,8 +771,8 @@ async function search(options) {
         n.namespace === "female"
           ? "female:" + n.value
           : n.namespace === "male"
-          ? "male:" + n.value
-          : n.value;
+            ? "male:" + n.value
+            : n.value;
     }
 
     const { galleryids, count } = await getSingleTagSearchPage({
@@ -792,8 +792,8 @@ async function search(options) {
       options.orderbydirection === "random"
         ? shuffleArray(gids)
         : options.orderbydirection === "asc"
-        ? gids.toReversed()
-        : gids;
+          ? gids.toReversed()
+          : gids;
     return {
       type: "all",
       gids: rgids,
@@ -813,7 +813,7 @@ function parseGalleryBlockInfo(body) {
   // 封面图URL
   const thumbnail_hashs = [];
   const srcs = Array.from(mangaEl.querySelectorAll("img")).map((a) =>
-    a.attributes["data-src"].trim()
+    a.attributes["data-src"].trim(),
   );
   srcs.forEach((src) => {
     const r = /\/(\w{64})\./.exec(src);
@@ -825,7 +825,7 @@ function parseGalleryBlockInfo(body) {
 
   // 作者列表
   const artists = Array.from(mangaEl.querySelectorAll(".artist-list li a")).map(
-    (a) => a.text.trim()
+    (a) => a.text.trim(),
   );
 
   let language = undefined;
@@ -1063,7 +1063,7 @@ class Hitomi extends ComicSource {
         });
 
         const comics = (await get_galleryblocks(result.galleryids)).map((n) =>
-          this._mapGalleryBlockInfoToComic(n)
+          this._mapGalleryBlockInfoToComic(n),
         );
 
         return {
@@ -1165,7 +1165,7 @@ class Hitomi extends ComicSource {
         const result = await search(searchOptions);
         if (result.type === "single") {
           const comics = (await get_galleryblocks(result.gids)).map((n) =>
-            this._mapGalleryBlockInfoToComic(n)
+            this._mapGalleryBlockInfoToComic(n),
           );
           this.categoryResultCache = {
             type: "single",
@@ -1179,7 +1179,7 @@ class Hitomi extends ComicSource {
         } else {
           const comics = (
             await get_galleryblocks(
-              result.gids.slice(25 * page - 25, 25 * page)
+              result.gids.slice(25 * page - 25, 25 * page),
             )
           ).map((n) => this._mapGalleryBlockInfoToComic(n));
           this.categoryResultCache = {
@@ -1199,7 +1199,7 @@ class Hitomi extends ComicSource {
             page: page - 1,
           });
           const comics = (await get_galleryblocks(result.galleryids)).map((n) =>
-            this._mapGalleryBlockInfoToComic(n)
+            this._mapGalleryBlockInfoToComic(n),
           );
           return {
             comics,
@@ -1208,7 +1208,7 @@ class Hitomi extends ComicSource {
         } else {
           const comics = (
             await get_galleryblocks(
-              this.categoryResultCache.gids.slice(25 * page - 25, 25 * page)
+              this.categoryResultCache.gids.slice(25 * page - 25, 25 * page),
             )
           ).map((n) => this._mapGalleryBlockInfoToComic(n));
           return {
@@ -1261,7 +1261,7 @@ class Hitomi extends ComicSource {
         });
 
         const comics = (await get_galleryblocks(result.galleryids)).map((n) =>
-          this._mapGalleryBlockInfoToComic(n)
+          this._mapGalleryBlockInfoToComic(n),
         );
 
         return {
@@ -1322,7 +1322,7 @@ class Hitomi extends ComicSource {
         const result = await search(searchOptions);
         if (result.type === "single") {
           const comics = (await get_galleryblocks(result.gids)).map((n) =>
-            this._mapGalleryBlockInfoToComic(n)
+            this._mapGalleryBlockInfoToComic(n),
           );
           this.searchResultCaches.set(cacheKey, {
             type: "single",
@@ -1336,7 +1336,7 @@ class Hitomi extends ComicSource {
         } else {
           const comics = (
             await get_galleryblocks(
-              result.gids.slice(25 * page - 25, 25 * page)
+              result.gids.slice(25 * page - 25, 25 * page),
             )
           ).map((n) => this._mapGalleryBlockInfoToComic(n));
           this.searchResultCaches.set(cacheKey, {
@@ -1357,7 +1357,7 @@ class Hitomi extends ComicSource {
             page: page - 1,
           });
           const comics = (await get_galleryblocks(result.galleryids)).map((n) =>
-            this._mapGalleryBlockInfoToComic(n)
+            this._mapGalleryBlockInfoToComic(n),
           );
           return {
             comics,
@@ -1366,7 +1366,7 @@ class Hitomi extends ComicSource {
         } else {
           const comics = (
             await get_galleryblocks(
-              searchResultCache.gids.slice(25 * page - 25, 25 * page)
+              searchResultCache.gids.slice(25 * page - 25, 25 * page),
             )
           ).map((n) => this._mapGalleryBlockInfoToComic(n));
           return {
@@ -1470,7 +1470,7 @@ class Hitomi extends ComicSource {
       let recommend = undefined;
       if (data.related_gids.length) {
         recommend = (await get_galleryblocks(data.related_gids)).map((n) =>
-          this._mapGalleryBlockInfoToComic(n)
+          this._mapGalleryBlockInfoToComic(n),
         );
       }
 

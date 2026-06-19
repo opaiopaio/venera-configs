@@ -16,8 +16,8 @@ class ComicWalker extends ComicSource {
     const headers = {
       "X-API-Environment-Key": this.api_key,
       "User-Agent": `BookWalkerApp/${this.latestVersion} (Android 13)`,
-      "Host": "mobileapp.comic-walker.com",
-      "Content-Type": "application/json"
+      Host: "mobileapp.comic-walker.com",
+      "Content-Type": "application/json",
     };
     const token = this.loadData("token");
     if (token) {
@@ -46,9 +46,7 @@ class ComicWalker extends ComicSource {
     } else {
       throw new Error(`Unsupported method: ${method}`);
     }
-    if (
-      response.status === 204
-    ) {
+    if (response.status === 204) {
       return response;
     }
     response = JSON.parse(response.body);
@@ -65,9 +63,7 @@ class ComicWalker extends ComicSource {
       } else {
         throw new Error(`Unsupported method: ${method}`);
       }
-      if (
-        response.status === 204
-      ) {
+      if (response.status === 204) {
         return response;
       }
       response = JSON.parse(response.body);
@@ -76,7 +72,8 @@ class ComicWalker extends ComicSource {
   }
 
   async init() {
-    const itunes_api = "https://itunes.apple.com/lookup?bundleId=jp.co.bookwalker.cwapp.ios&country=jp";
+    const itunes_api =
+      "https://itunes.apple.com/lookup?bundleId=jp.co.bookwalker.cwapp.ios&country=jp";
 
     const resp = await Network.get(itunes_api);
 
@@ -100,48 +97,51 @@ class ComicWalker extends ComicSource {
 
         const result = {};
 
-        const newArrivals = res.resources.new_arrival_comics.map((item) =>
-          new Comic({
-            id: item.id,
-            title: item.title,
-            cover: item.thumbnail_1x1 || "",
-            tags: item.comic_labels?.map((l) => l.name) || [],
-          }),
+        const newArrivals = res.resources.new_arrival_comics.map(
+          (item) =>
+            new Comic({
+              id: item.id,
+              title: item.title,
+              cover: item.thumbnail_1x1 || "",
+              tags: item.comic_labels?.map((l) => l.name) || [],
+            }),
         );
         result["今日の更新"] = newArrivals;
 
-        const attention = res.resources.attention_comics.map((item) =>
-          new Comic({
-            id: item.comic_id,
-            title: item.title,
-            cover: item.image_url || "",
-            tags: item.comic_labels?.map((l) => l.name) || [],
-          }),
+        const attention = res.resources.attention_comics.map(
+          (item) =>
+            new Comic({
+              id: item.comic_id,
+              title: item.title,
+              cover: item.image_url || "",
+              tags: item.comic_labels?.map((l) => l.name) || [],
+            }),
         );
         result["注目作品"] = attention;
 
         for (const pickup of res.resources.pickup_comics) {
-            const comics = pickup.comics.map((item) =>
-                new Comic({
-                    id: item.id,
-                    title: item.title,
-                    cover: item.thumbnail_1x1 || "",
-                    tags: item.comic_labels?.map((l) => l.name) || [],
-                }),
-            );
-            result[pickup.name] = comics;
-        }
-
-        const newSerialization = res.resources.new_serialization_comics.map((item) =>
-            new Comic({
+          const comics = pickup.comics.map(
+            (item) =>
+              new Comic({
                 id: item.id,
                 title: item.title,
                 cover: item.thumbnail_1x1 || "",
                 tags: item.comic_labels?.map((l) => l.name) || [],
+              }),
+          );
+          result[pickup.name] = comics;
+        }
+
+        const newSerialization = res.resources.new_serialization_comics.map(
+          (item) =>
+            new Comic({
+              id: item.id,
+              title: item.title,
+              cover: item.thumbnail_1x1 || "",
+              tags: item.comic_labels?.map((l) => l.name) || [],
             }),
         );
         result["新連載"] = newSerialization;
-
 
         return result;
       },
@@ -157,16 +157,17 @@ class ComicWalker extends ComicSource {
         this.headers,
       );
 
-      const comics = res.resources.map((item) =>
-        new Comic({
-          id: item.id,
-          title: item.title,
-          cover: item.thumbnail_1x1 || "",
-          tags: [
-            ...(item.authors?.map((a) => a.name) || []),
-            ...(item.comic_labels?.map((l) => l.name) || []),
-          ],
-        })
+      const comics = res.resources.map(
+        (item) =>
+          new Comic({
+            id: item.id,
+            title: item.title,
+            cover: item.thumbnail_1x1 || "",
+            tags: [
+              ...(item.authors?.map((a) => a.name) || []),
+              ...(item.comic_labels?.map((l) => l.name) || []),
+            ],
+          }),
       );
       const pageInfo = {
         hasNextPage: res.resources.length === 20,
@@ -175,7 +176,7 @@ class ComicWalker extends ComicSource {
 
       return {
         comics,
-        maxPage: pageInfo.hasNextPage ? (page || 1) + 1 : (page || 1),
+        maxPage: pageInfo.hasNextPage ? (page || 1) + 1 : page || 1,
         endCursor: pageInfo.endCursor,
       };
     },
@@ -225,11 +226,9 @@ class ComicWalker extends ComicSource {
       const chapters = new Map();
       for (const ep of episodes.resources) {
         let canRent = false;
-        const plans = (ep.plans || []).filter((plan) =>
-      plan.type !== "paid"
-        );
+        const plans = (ep.plans || []).filter((plan) => plan.type !== "paid");
         if (Array.isArray(plans) && plans.length > 0) {
-      canRent = true;
+          canRent = true;
         }
         const title = canRent ? ep.title : `❌ ${ep.title}`;
         chapters.set(ep.id, title);
@@ -253,14 +252,12 @@ class ComicWalker extends ComicSource {
         `${this.api_base}/v1/episodes/${epId}`,
         this.headers,
       );
-      const plans = (detail.plans || []).filter((plan) =>
-        // plan.type !== "daily_video_free" &&
-        plan.type !== "paid"
+      const plans = (detail.plans || []).filter(
+        (plan) =>
+          // plan.type !== "daily_video_free" &&
+          plan.type !== "paid",
       );
-      if (
-        !Array.isArray(plans) ||
-        plans.length === 0
-      ) {
+      if (!Array.isArray(plans) || plans.length === 0) {
         throw new Error("No available rental plans after filtering");
       }
       console.log(plans);
@@ -280,8 +277,8 @@ class ComicWalker extends ComicSource {
       );
       const manuscripts = res.resources.manuscripts || [];
       return {
-        images: manuscripts.map((m) =>
-          `${m.drm_image_url}&drm_hash=${m.drm_hash}`
+        images: manuscripts.map(
+          (m) => `${m.drm_image_url}&drm_hash=${m.drm_hash}`,
         ),
       };
     },
@@ -292,25 +289,29 @@ class ComicWalker extends ComicSource {
       const drmHashMatch = url.match(/[?&]drm_hash=([^&]+)/);
       if (drmHashMatch) {
         drm_hash = decodeURIComponent(drmHashMatch[1]);
-        cleanUrl = url.replace(/([?&])drm_hash=[^&]+(&)?/, (match, p1, p2) => {
+        cleanUrl = url
+          .replace(/([?&])drm_hash=[^&]+(&)?/, (match, p1, p2) => {
+            if (p2) return p1;
+            return "";
+          })
+          .replace(/[?&]$/, "");
+      }
+      cleanUrl = cleanUrl
+        .replace(/([?&])weight=[^&]+(&)?/, (match, p1, p2) => {
           if (p2) return p1;
           return "";
-        }).replace(/[?&]$/, "");
-      }
-      cleanUrl = cleanUrl.replace(/([?&])weight=[^&]+(&)?/, (match, p1, p2) => {
-        if (p2) return p1;
-        return "";
-      }).replace(/[?&]$/, "");
+        })
+        .replace(/[?&]$/, "");
 
-      cleanUrl = cleanUrl.replace(/([?&])height=[^&]+(&)?/, (match, p1, p2) => {
-        if (p2) return p1;
-        return "";
-      }).replace(/[?&]$/, "");
+      cleanUrl = cleanUrl
+        .replace(/([?&])height=[^&]+(&)?/, (match, p1, p2) => {
+          if (p2) return p1;
+          return "";
+        })
+        .replace(/[?&]$/, "");
 
       if (drm_hash.length < 2) {
-        throw new Error(
-          "drm_hash must be at least 2 characters long",
-        );
+        throw new Error("drm_hash must be at least 2 characters long");
       }
       var version = drm_hash.slice(0, 2);
       if (version !== "01") {
@@ -318,9 +319,7 @@ class ComicWalker extends ComicSource {
       }
       var key_part = drm_hash.slice(2);
       if (key_part.length < 16) {
-        throw new Error(
-          "Key part must be 16 characters long (8 hex numbers)",
-        );
+        throw new Error("Key part must be 16 characters long (8 hex numbers)");
       }
       var key = [];
       for (var i = 0; i < 8; i++) {
@@ -330,7 +329,7 @@ class ComicWalker extends ComicSource {
       const keyArray = key;
       const onResponseScript = `
         function onResponse(buffer) {
-          var key = [${keyArray.join(',')}];
+          var key = [${keyArray.join(",")}];
           var view = new Uint8Array(buffer);
           for (var i = 0; i < view.length; i++) {
         view[i] ^= key[i % key.length];
@@ -342,16 +341,18 @@ class ComicWalker extends ComicSource {
       return {
         url: cleanUrl,
         headers: this.headers,
-        onResponse: async (buffer)  => {
+        onResponse: async (buffer) => {
           return await compute(onResponseScript, buffer);
-        }
+        },
       };
     },
 
     onClickTag: (namespace, tag) => {
       if (
-        namespace === "漫画" || namespace === "原作" ||
-        namespace === "キャラクター原案" || namespace === "著者"
+        namespace === "漫画" ||
+        namespace === "原作" ||
+        namespace === "キャラクター原案" ||
+        namespace === "著者"
       ) {
         return {
           action: "search",

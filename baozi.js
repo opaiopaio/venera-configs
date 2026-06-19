@@ -54,12 +54,12 @@ class Baozi extends ComicSource {
       options: [
         {
           value: "/w640",
-          text: "640p"
+          text: "640p",
         },
         {
           value: "",
-          text: "原图"
-        }
+          text: "原图",
+        },
       ],
       default: "/w640",
     },
@@ -87,10 +87,10 @@ class Baozi extends ComicSource {
             "multipart/form-data; boundary=----WebKitFormBoundaryFUNUxpOwyUaDop8s",
         },
         '------WebKitFormBoundaryFUNUxpOwyUaDop8s\r\nContent-Disposition: form-data; name="username"\r\n\r\n' +
-        account +
-        '\r\n------WebKitFormBoundaryFUNUxpOwyUaDop8s\r\nContent-Disposition: form-data; name="password"\r\n\r\n' +
-        pwd +
-        "\r\n------WebKitFormBoundaryFUNUxpOwyUaDop8s--\r\n"
+          account +
+          '\r\n------WebKitFormBoundaryFUNUxpOwyUaDop8s\r\nContent-Disposition: form-data; name="password"\r\n\r\n' +
+          pwd +
+          "\r\n------WebKitFormBoundaryFUNUxpOwyUaDop8s--\r\n",
       );
       if (res.status !== 200) {
         throw "Invalid status code: " + res.status;
@@ -110,7 +110,7 @@ class Baozi extends ComicSource {
     // 退出登录时将会调用此函数
     logout: function () {
       Network.deleteCookies(
-        this.loadSetting("domains") || this.settings.domains.default
+        this.loadSetting("domains") || this.settings.domains.default,
       );
     },
 
@@ -267,7 +267,7 @@ class Baozi extends ComicSource {
   categoryComics = {
     load: async (category, param, options, page) => {
       let res = await Network.get(
-        `${this.baseUrl}/api/bzmhq/amp_comic_list?type=${param}&region=${options[0]}&state=${options[1]}&filter=%2a&page=${page}&limit=36&language=${this.lang}&__amp_source_origin=${this.baseUrl}`
+        `${this.baseUrl}/api/bzmhq/amp_comic_list?type=${param}&region=${options[0]}&state=${options[1]}&filter=%2a&page=${page}&limit=36&language=${this.lang}&__amp_source_origin=${this.baseUrl}`,
       );
       if (res.status !== 200) {
         throw "Invalid status code: " + res.status;
@@ -322,7 +322,7 @@ class Baozi extends ComicSource {
     addOrDelFavorite: async (comicId, folderId, isAdding) => {
       if (!isAdding) {
         let res = await Network.post(
-          `${this.baseUrl}/user/operation_v2?op=del_bookmark&comic_id=${comicId}`
+          `${this.baseUrl}/user/operation_v2?op=del_bookmark&comic_id=${comicId}`,
         );
         if (!res.status || res.status >= 400) {
           throw "Invalid status code: " + res.status;
@@ -330,7 +330,7 @@ class Baozi extends ComicSource {
         return "ok";
       } else {
         let res = await Network.post(
-          `${this.baseUrl}/user/operation_v2?op=set_bookmark&comic_id=${comicId}&chapter_slot=0`
+          `${this.baseUrl}/user/operation_v2?op=set_bookmark&comic_id=${comicId}&chapter_slot=0`,
         );
         if (!res.status || res.status >= 400) {
           throw "Invalid status code: " + res.status;
@@ -408,7 +408,7 @@ class Baozi extends ComicSource {
           // 合并所有章节容器（处理可能存在多个列表的情况）
           const containers = [
             ...document.querySelectorAll(
-              "#chapter-items, #chapters_other_list"
+              "#chapter-items, #chapters_other_list",
             ),
           ];
           let allChapters = [];
@@ -430,13 +430,13 @@ class Baozi extends ComicSource {
       let chapters = new Map();
       let i = 0;
       for (let c of document.querySelectorAll(
-        "div#chapter-items > div.comics-chapters > a > div > span"
+        "div#chapter-items > div.comics-chapters > a > div > span",
       )) {
         chapters.set(i.toString(), c.text.trim());
         i++;
       }
       for (let c of document.querySelectorAll(
-        "div#chapters_other_list > div.comics-chapters > a > div > span"
+        "div#chapters_other_list > div.comics-chapters > a > div > span",
       )) {
         chapters.set(i.toString(), c.text.trim());
         i++;
@@ -444,7 +444,7 @@ class Baozi extends ComicSource {
       if (i === 0) {
         // 将倒序的最新章节反转
         const spans = Array.from(
-          document.querySelectorAll("div.comics-chapters > a > div > span")
+          document.querySelectorAll("div.comics-chapters > a > div > span"),
         ).reverse();
         for (let c of spans) {
           chapters.set(i.toString(), c.text.trim());
@@ -500,11 +500,17 @@ class Baozi extends ComicSource {
       // 解析当前页图片(App 版)
       const imageNodes = doc.querySelectorAll(".comic-contain > .chapter-img");
       imageNodes.forEach((imgNode) => {
-        let imgUrl = imgNode.querySelector(".comic-contain__item")?.attributes?.["data-src"];
+        let imgUrl = imgNode.querySelector(".comic-contain__item")
+          ?.attributes?.["data-src"];
         if (imgUrl) {
-          const match = imgUrl.match(/^(https?:\/\/)?([^/\s:]+)(:\d+)?(\/[a-z]comic\/.*)/);
+          const match = imgUrl.match(
+            /^(https?:\/\/)?([^/\s:]+)(:\d+)?(\/[a-z]comic\/.*)/,
+          );
           if (match) {
-            const domain = this.loadSetting("cdn_domains") === "" ? match[2] : this.loadSetting("cdn_domains");
+            const domain =
+              this.loadSetting("cdn_domains") === ""
+                ? match[2]
+                : this.loadSetting("cdn_domains");
             imgUrl = `${match[1]}${domain}${this.loadSetting("image_quality")}${match[4]}`;
           }
           images.push(imgUrl);

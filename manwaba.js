@@ -30,7 +30,7 @@ class ManWaBa extends ComicSource {
      */
     this.fetchJson = async (
       url,
-      { method = "GET", params, headers, payload }
+      { method = "GET", params, headers, payload },
     ) => {
       if (params) {
         let params_str = Object.keys(params)
@@ -85,7 +85,7 @@ class ManWaBa extends ComicSource {
         };
         const url = `${this.api}/home`;
         const data = await this.fetchJson(url, { params }).then(
-          (res) => res.data
+          (res) => res.data,
         );
         let magnaList = {
           热门: data.comicList,
@@ -199,27 +199,27 @@ class ManWaBa extends ComicSource {
     load: async (category, param, options, page) => {
       let pathMap = {
         "": "/cate",
-        "热血": "/cate/hotblooded",
-        "玄幻": "/cate/xuanhuan",
-        "恋爱": "/cate/romance",
-        "冒险": "/cate/adventure",
-        "古风": "/cate/historical",
-        "都市": "/cate/urban",
-        "穿越": "/cate/transmigration",
-        "奇幻": "/cate/fantasy",
-        "搞笑": "/cate/comedy",
-        "少男": "/cate/shounen",
-        "战斗": "/cate/action",
-        "重生": "/cate/rebirth",
-        "逆袭": "/cate/counterattack",
-        "爆笑": "/cate/hilarious",
-        "少年": "/cate/youth",
-        "系统": "/cate/system",
-        "BL": "/cate/bl",
-        "韩漫": "/cate/manhwa",
-        "完整版": "/cate/fullversion",
+        热血: "/cate/hotblooded",
+        玄幻: "/cate/xuanhuan",
+        恋爱: "/cate/romance",
+        冒险: "/cate/adventure",
+        古风: "/cate/historical",
+        都市: "/cate/urban",
+        穿越: "/cate/transmigration",
+        奇幻: "/cate/fantasy",
+        搞笑: "/cate/comedy",
+        少男: "/cate/shounen",
+        战斗: "/cate/action",
+        重生: "/cate/rebirth",
+        逆袭: "/cate/counterattack",
+        爆笑: "/cate/hilarious",
+        少年: "/cate/youth",
+        系统: "/cate/system",
+        BL: "/cate/bl",
+        韩漫: "/cate/manhwa",
+        完整版: "/cate/fullversion",
         "19r": "/cate/19plus",
-        "台版": "/cate/taiwanver",
+        台版: "/cate/taiwanver",
       };
       let url = this.api + pathMap[param] || "/cate";
       let payload = JSON.stringify({
@@ -343,7 +343,7 @@ class ManWaBa extends ComicSource {
     loadInfo: async (id) => {
       let url = `${this.api}/comic/${id}`;
       let data = await this.fetchJson(url, { payload: undefined }).then(
-        (res) => res.data
+        (res) => res.data,
       );
       this.logger.warn(`loadInfo: ${data}`);
       let chapterId = data.id;
