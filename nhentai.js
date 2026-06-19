@@ -7,7 +7,7 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.0.8";
+  version = "1.1.0";
 
   minAppVersion = "1.0.0";
 
@@ -704,56 +704,16 @@ class Nhentai extends ComicSource {
      */
     loadEp: async (comicId, epId) => {
       comicId = this.normalizeComicId(comicId);
-
-      let apiRes = await Network.get(
-        `${this.apiBaseUrl}/galleries/${comicId}/pages`,
+      let res = await Network.get(
+        `${this.apiBaseUrl}/galleries/${comicId}`,
         {},
       );
-      if (apiRes.status === 200) {
-        let apiData = JSON.parse(apiRes.body);
-        let images = (apiData.pages || []).map((p) =>
-          this.toAbsoluteMediaUrl(p.path, false),
-        );
-        if (images.length > 0) {
-          return { images: images };
-        }
-      }
-
-      let res = await Network.get(`${this.baseUrl}/g/${comicId}/1/`, {});
-      if (res.status !== 200) {
-        throw "Invalid Status Code: " + res.status;
-      }
-      let document = new HtmlDocument(res.body);
-      let script = document.querySelectorAll("script").find((e) => {
-        return e.text.includes("window._gallery");
-      }).text;
-      let json = script.split('JSON.parse("')[1].split('");')[0];
-      let decodedJsonText = json
-        .replaceAll("\\u0022", '"')
-        .replaceAll("\\u005C", "\\");
-      let data = JSON.parse(decodedJsonText);
-      let mediaId = data.media_id;
-      let images = [];
-      for (let image of data.images.pages) {
-        let ext = "jpg";
-        switch (image.t) {
-          case "p":
-            ext = "png";
-            break;
-          case "g":
-            ext = "gif";
-            break;
-          case "w":
-            ext = "webp";
-            break;
-        }
-        images.push(
-          `https://i3.nhentai.net/galleries/${mediaId}/${images.length + 1}.${ext}`,
-        );
-      }
-      return {
-        images: images,
-      };
+      if (res.status !== 200) throw "Invalid Status Code: " + res.status;
+      let d = JSON.parse(res.body);
+      let images = (d.pages || []).map((p) =>
+        this.toAbsoluteMediaUrl(p.path, false),
+      );
+      return { images };
     },
     /**
      * [Optional] load comments
@@ -773,7 +733,7 @@ class Nhentai extends ComicSource {
         throw "Invalid Status Code: " + res.status;
       }
       let data = JSON.parse(res.body);
-      let comments = data.map((c) => {
+      let comments = (data.result || data || []).map((c) => {
         return new Comment({
           userName: c.poster.username,
           avatar: this.toAbsoluteMediaUrl(c.poster.avatar_url, false),
