@@ -5,17 +5,22 @@ class Komiic extends ComicSource {
   // 唯一标识符
   key = "Komiic";
 
-  version = "1.0.3";
+  version = "1.0.4";
 
   minAppVersion = "1.0.0";
 
   // 更新链接
   url = "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/komiic.js";
 
+  // 可选访问域名，默认主站
+  get baseUrl() {
+    return this.loadSetting("domain") || "https://komiic.com";
+  }
+
   get headers() {
     let token = this.loadData("token");
     let headers = {
-      Referer: "https://komiic.com/",
+      Referer: this.baseUrl + "/",
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       "Content-Type": "application/json",
@@ -28,7 +33,7 @@ class Komiic extends ComicSource {
 
   async queryJson(query) {
     let res = await Network.post(
-      "https://komiic.com/api/query",
+      this.baseUrl + "/api/query",
       this.headers,
       query,
     );
@@ -115,14 +120,10 @@ class Komiic extends ComicSource {
     /// 登录
     /// 返回任意值表示登录成功
     login: async (account, pwd) => {
-      let res = await Network.post(
-        "https://komiic.com/api/login",
-        this.headers,
-        {
-          email: account,
-          password: pwd,
-        },
-      );
+      let res = await Network.post(this.baseUrl + "/api/login", this.headers, {
+        email: account,
+        password: pwd,
+      });
 
       if (res.status === 200) {
         this.saveData("token", JSON.parse(res.body).token);
@@ -522,21 +523,6 @@ class Komiic extends ComicSource {
       let recommend = json1.data.recommendComicById;
       recommend.push(id);
 
-      let getFavoriteStatus = async () => {
-        let token = this.loadData("token");
-        if (!token) {
-          return false;
-        }
-        let json = await this.queryJson({
-          operationName: "comicInAccountFolders",
-          variables: { comicId: id },
-          query:
-            "query comicInAccountFolders($comicId: ID!) {\n  comicInAccountFolders(comicId: $comicId)\n}",
-        });
-        let folders = json.data.comicInAccountFolders;
-        return folders.length !== 0;
-      };
-
       let getChapter = async () => {
         let json = await this.queryJson({
           operationName: "chapterByComicId",
@@ -604,7 +590,7 @@ class Komiic extends ComicSource {
       });
       return {
         images: json.data.imagesByChapterId.map((i) => {
-          return `https://komiic.com/api/image/${i.kid}`;
+          return this.baseUrl + `/api/image/${i.kid}`;
         }),
       };
     },
@@ -614,7 +600,8 @@ class Komiic extends ComicSource {
         headers: {
           "user-agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-          referer: `https://komiic.com/comic/${comicId}/chapter/${epId}/images/all`,
+          referer:
+            this.baseUrl + `/comic/${comicId}/chapter/${epId}/images/all`,
         },
       };
     },
@@ -676,6 +663,52 @@ class Komiic extends ComicSource {
           "mutation addMessageToComic($comicId: ID!, $replyToId: ID!, $message: String!) {\n  addMessageToComic(message: $message, comicId: $comicId, replyToId: $replyToId) {\n    id\n    message\n    comicId\n    account {\n      id\n      nickname\n      __typename\n    }\n    replyTo {\n      id\n      message\n      account {\n        id\n        nickname\n        profileText\n        profileTextColor\n        profileBackgroundColor\n        profileImageUrl\n        __typename\n      }\n      __typename\n    }\n    dateCreated\n    dateUpdated\n    __typename\n  }\n}",
       });
       return "ok";
+    },
+  };
+
+  /// 链接处理
+  /// 用于从浏览器跳转回 App 时识别本源
+  link = {
+    // 接受的域名列表，包含主站与各镜像
+    domains: ["komiic.com", "komiic.cc"],
+    // 将 url 解析为漫画 id
+    linkToId: (url) => {
+      // 形如 https://komiic.com/comic/12345
+      let match = url.match(/\/comic\/(\d+)/);
+      if (match) {
+        return match[1];
+      }
+      return null;
+    },
+  };
+
+  /// 设置
+  /// 提供多域名切换，遇到某域名失效时可自助切换
+  settings = {
+    domain: {
+      title: "访问域名",
+      type: "select",
+      options: [
+        { value: "https://komiic.com", text: "主站 (komiic.com)" },
+        {
+          value: "https://komiic.cc",
+          text: "中国大陆线路 (komiic.cc，速度更稳定)",
+        },
+      ],
+      default: "https://komiic.com",
+    },
+  };
+
+  // 翻译
+  translation = {
+    zh_CN: {
+      访问域名: "访问域名",
+    },
+    zh_TW: {
+      访问域名: "訪問域名",
+    },
+    en: {
+      访问域名: "Domain",
     },
   };
 }
