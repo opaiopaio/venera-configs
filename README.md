@@ -18,7 +18,7 @@ https://cdn.jsdelivr.net/gh/opaiopaio/venera-configs@main/index.json
 | Komiic | Komiic | 1.0.4 |
 | 包子漫画 | baozi | 1.1.6 |
 | Picacg | picacg | 1.0.5 |
-| nhentai | nhentai | 1.2.0 |
+| nhentai | nhentai | 1.2.1 |
 | 紳士漫畫 | wnacg | 1.0.4 |
 | ehentai | ehentai | 1.2.0 |
 | 禁漫天堂 | jm | 1.4.0 |
