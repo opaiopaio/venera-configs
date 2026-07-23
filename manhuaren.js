@@ -8,7 +8,7 @@ class ManHuaRen extends ComicSource {
 
   minAppVersion = "1.6.0";
 
-  url = "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/manhuaren.js";
+  url = "https://cdn.jsdelivr.net/gh/opaiopaio/venera-configs@main/manhuaren.js";
 
   init() {}
 

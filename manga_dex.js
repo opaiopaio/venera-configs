@@ -13,7 +13,7 @@ class MangaDex extends ComicSource {
   minAppVersion = "1.6.0";
 
   // update url
-  url = "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/manga_dex.js";
+  url = "https://cdn.jsdelivr.net/gh/opaiopaio/venera-configs@main/manga_dex.js";
 
   comicsPerPage = 20;
 

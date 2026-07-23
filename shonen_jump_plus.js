@@ -4,7 +4,7 @@ class ShonenJumpPlus extends ComicSource {
   version = "1.1.1";
   minAppVersion = "1.2.1";
   url =
-    "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/shonen_jump_plus.js";
+    "https://cdn.jsdelivr.net/gh/opaiopaio/venera-configs@main/shonen_jump_plus.js";
 
   deviceId = this.generateDeviceId();
   bearerToken = null;

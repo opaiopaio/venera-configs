@@ -13,7 +13,7 @@ class ManWaBa extends ComicSource {
   minAppVersion = "1.4.0";
 
   // update url
-  url = "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/manwaba.js";
+  url = "https://cdn.jsdelivr.net/gh/opaiopaio/venera-configs@main/manwaba.js";
 
   //api = "https://www.manwaba.com/api"; //重定向之前的地址无法使用分类
   api = "https://www.mhtmh.org/api";

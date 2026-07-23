@@ -10,7 +10,7 @@ class Komiic extends ComicSource {
   minAppVersion = "1.0.0";
 
   // 更新链接
-  url = "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/komiic.js";
+  url = "https://cdn.jsdelivr.net/gh/opaiopaio/venera-configs@main/komiic.js";
 
   // 可选访问域名，默认主站
   get baseUrl() {

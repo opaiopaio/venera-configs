@@ -13,7 +13,7 @@ class HotManga extends ComicSource {
 
   minAppVersion = "1.6.0";
 
-  url = "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/hot_manga.js";
+  url = "https://cdn.jsdelivr.net/gh/opaiopaio/venera-configs@main/hot_manga.js";
 
   static defaultImageQuality = "1500";
 
