@@ -7,7 +7,7 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.2.1";
+  version = "1.2.2";
 
   minAppVersion = "1.0.0";
 
@@ -21,30 +21,6 @@ class Nhentai extends ComicSource {
 
   // [Optional] account related
   account = {
-    /**
-     * login with API key.
-     * Enter your API key as the account name (password can be left empty).
-     * Generate one at https://nhentai.net/user/settings#apikeys
-     */
-    login: async (account, pwd) => {
-      let res = await Network.get(
-        `${this.apiBaseUrl}/favorites?page=1`,
-        {
-          "User-Agent":
-            "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
-          Authorization: `Key ${account}`,
-        },
-      );
-      if (res.status === 200) {
-        this.saveData("apiKey", account);
-        return "ok";
-      }
-      if (res.status === 401) {
-        throw "Invalid API key";
-      }
-      throw "Login failed: " + res.status;
-    },
-
     loginWithWebview: {
       url: "https://nhentai.net/login/?next=/",
       checkStatus: (url, title) => {
