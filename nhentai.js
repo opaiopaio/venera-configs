@@ -8,7 +8,7 @@ class Nhentai extends ComicSource {
   key = "nhentai";
 
   version = "1.3.0";
-  // CDN cache bust
+  // CDN cache bust 
 
   minAppVersion = "1.0.0";
 
