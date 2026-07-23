@@ -7,7 +7,7 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.2.3";
+  version = "1.2.4";
   // CDN cache bust
 
   minAppVersion = "1.0.0";
@@ -287,7 +287,7 @@ class Nhentai extends ComicSource {
         // Prefer v2 API to get accurate pagination for tag pages.
         let res = await Network.get(
           `${this.apiBaseUrl}/galleries/tagged?tag_id=${tagId}`,
-          {},
+          this._headers(),
         );
         if (res.status !== 200) {
           let h1 = document.querySelector("div#content > h1")?.text || "";
@@ -333,7 +333,7 @@ class Nhentai extends ComicSource {
         if (page && page !== 1) {
           url = `${url}?page=${page}`;
         }
-        let res = await Network.get(url, {});
+        let res = await Network.get(url, this._headers());
         if (res.status !== 200) {
           throw "Invalid Status Code: " + res.status;
         }
@@ -436,7 +436,7 @@ class Nhentai extends ComicSource {
       let sort = (options[0] || "popular").replaceAll("@", "-");
       category = category.replaceAll(".", "-");
       let url = `${this.baseUrl}/${param}/${encodeURIComponent(category)}${sort}?page=${page}`;
-      let res = await Network.get(url, {});
+      let res = await Network.get(url, this._headers());
       return this.parseComicList(res.body, "category");
     },
     // provide options for category comic loading
@@ -466,7 +466,7 @@ class Nhentai extends ComicSource {
     load: async (keyword, options, page) => {
       let sort = options[0] || "date";
       let url = `${this.apiBaseUrl}/search?query=${encodeURIComponent(keyword)}&page=${page}&sort=${sort}`;
-      let res = await Network.get(url, {});
+      let res = await Network.get(url, this._headers());
       if (res.status !== 200) {
         throw "Invalid Status Code: " + res.status;
       }
@@ -574,7 +574,7 @@ class Nhentai extends ComicSource {
 
       let apiRes = await Network.get(
         `${this.apiBaseUrl}/galleries/${id}?include=related,favorite`,
-        {},
+        this._headers(),
       );
       if (apiRes.status === 200) {
         let data = JSON.parse(apiRes.body);
@@ -603,7 +603,7 @@ class Nhentai extends ComicSource {
         if (thumbnails.length === 0) {
           let pagesRes = await Network.get(
             `${this.apiBaseUrl}/galleries/${id}/pages`,
-            {},
+            this._headers(),
           );
           if (pagesRes.status === 200) {
             let pagesData = JSON.parse(pagesRes.body);
@@ -718,7 +718,7 @@ class Nhentai extends ComicSource {
       comicId = this.normalizeComicId(comicId);
       let res = await Network.get(
         `${this.apiBaseUrl}/galleries/${comicId}`,
-        {},
+        this._headers(),
       );
       if (res.status !== 200) throw "Invalid Status Code: " + res.status;
       let d = JSON.parse(res.body);
@@ -739,7 +739,7 @@ class Nhentai extends ComicSource {
       comicId = this.normalizeComicId(comicId);
       let res = await Network.get(
         `${this.apiBaseUrl}/galleries/${comicId}/comments`,
-        {},
+        this._headers(),
       );
       if (res.status !== 200) {
         throw "Invalid Status Code: " + res.status;
