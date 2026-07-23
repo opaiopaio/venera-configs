@@ -7,7 +7,7 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.2.6";
+  version = "1.2.7";
   // CDN cache bust
 
   minAppVersion = "1.0.0";
@@ -817,8 +817,7 @@ class Nhentai extends ComicSource {
       callback: () => {
         UI.showDialog(
           "How to Get API Key",
-          this.loadSetting("getApiKeyTutorial") ||
-            "1. Login to your account<br>2. Click your avatar<br>3. Click Settings<br>4. Scroll down to create API Key<br>5. Copy the API Key and come back to login",
+          "1. Login to your account<br>2. Click your avatar<br>3. Click Settings<br>4. Scroll down to create API Key<br>5. Copy the API Key and come back to login",
           [
             {
               text: "Open Website",
