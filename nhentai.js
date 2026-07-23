@@ -802,7 +802,7 @@ class Nhentai extends ComicSource {
   };
 
   // [Optional] settings related
-  // Generate an API key at https://nhentai.net/user/settings#apikeys
+  // Generate an API key at https://nhentai.net/user/settings
   settings = {
     apiKey: {
       title: "API Key",
@@ -815,7 +815,7 @@ class Nhentai extends ComicSource {
       type: "callback",
       buttonText: "Open API Key Page",
       callback: () => {
-        UI.launchUrl("https://nhentai.net/user/settings#apikeys");
+        UI.launchUrl("https://nhentai.net/user/settings");
       },
     },
   };
