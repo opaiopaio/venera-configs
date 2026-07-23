@@ -818,8 +818,8 @@ class Nhentai extends ComicSource {
         let isCN = APP.locale && APP.locale.startsWith("zh");
         let title = isCN ? "如何获取 API Key" : "How to Get API Key";
         let content = isCN
-          ? "<b>1.</b> 登录你的账号<br><br><b>2.</b> 点击右上角头像<br><br><b>3.</b> 点击「设置」(Settings)<br><br><b>4.</b> 下滑找到 API Key 区域，点击创建<br><br><b>5.</b> 复制 API Key，返回此处登录填写"
-          : "<b>1.</b> Login to your account<br><br><b>2.</b> Click your avatar<br><br><b>3.</b> Click Settings<br><br><b>4.</b> Scroll down to API Key section and create one<br><br><b>5.</b> Copy the API Key and come back to login";
+          ? "1. 登录你的账号\n\n2. 点击右上角头像\n\n3. 点击「设置」(Settings)\n\n4. 下滑找到 API Key 区域，点击创建\n\n5. 复制 API Key，返回此处登录填写"
+          : "1. Login to your account\n\n2. Click your avatar\n\n3. Click Settings\n\n4. Scroll down to API Key section and create one\n\n5. Copy the API Key and come back to login";
         let openText = isCN ? "打开网页" : "Open Website";
         let closeText = isCN ? "关闭" : "Close";
         UI.showDialog(title, content, [
