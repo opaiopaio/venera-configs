@@ -7,7 +7,7 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.2.7";
+  version = "1.2.8";
   // CDN cache bust
 
   minAppVersion = "1.0.0";
@@ -71,11 +71,11 @@ class Nhentai extends ComicSource {
     let id = idMatch ? idMatch.join("") : "";
     let lang = "Unknown";
     let tags = element.attributes["data-tags"] || "";
-    if (tags.includes("12227")) {
+    if (tags.indexOf("12227") !== -1) {
       lang = "English";
-    } else if (tags.includes("6346")) {
+    } else if (tags.indexOf("6346") !== -1) {
       lang = "日本語";
-    } else if (tags.includes("29963")) {
+    } else if (tags.indexOf("29963") !== -1) {
       lang = "中文";
     }
     let tagsRes = [];
@@ -173,11 +173,11 @@ class Nhentai extends ComicSource {
   parseComicFromApi(item) {
     let lang = "Unknown";
     let tagIds = item.tag_ids || [];
-    if (tagIds.includes(12227)) {
+    if (tagIds.indexOf(12227) !== -1) {
       lang = "English";
-    } else if (tagIds.includes(6346)) {
+    } else if (tagIds.indexOf(6346) !== -1) {
       lang = "日本語";
-    } else if (tagIds.includes(29963)) {
+    } else if (tagIds.indexOf(29963) !== -1) {
       lang = "中文";
     }
     let tagsRes = [];
