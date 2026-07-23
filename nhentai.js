@@ -7,7 +7,7 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.2.4";
+  version = "1.2.5";
   // CDN cache bust
 
   minAppVersion = "1.0.0";
@@ -810,6 +810,14 @@ class Nhentai extends ComicSource {
       validator: null,
       default: "",
     },
+    getApiKey: {
+      title: "Get API Key",
+      type: "callback",
+      buttonText: "Open API Key Page",
+      callback: () => {
+        UI.launchUrl("https://nhentai.net/user/settings#apikeys");
+      },
+    },
   };
 
   // [Optional] translations for the strings in this config
@@ -830,6 +838,8 @@ class Nhentai extends ComicSource {
       Parodies: "原作",
       Categories: "分类",
       "API Key": "API 密钥",
+      "Get API Key": "获取 API Key",
+      "Open API Key Page": "打开 API Key 页面",
     },
     zh_TW: {
       Tags: "標籤",
@@ -847,9 +857,13 @@ class Nhentai extends ComicSource {
       Parodies: "原作",
       Categories: "分類",
       "API Key": "API 金鑰",
+      "Get API Key": "取得 API Key",
+      "Open API Key Page": "開啟 API Key 頁面",
     },
     en: {
       "API Key": "API Key",
+      "Get API Key": "Get API Key",
+      "Open API Key Page": "Open API Key Page",
     },
   };
 
