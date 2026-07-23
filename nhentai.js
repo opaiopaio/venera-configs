@@ -25,7 +25,7 @@ class Nhentai extends ComicSource {
     loginWithWebview: {
       url: "https://nhentai.net/login/?next=/",
       checkStatus: (url, title) => {
-        return url.includes("nhentai") && !url.includes("/login");
+        return title && title.includes("nhentai") && !url.includes("/login");
       },
     },
 
