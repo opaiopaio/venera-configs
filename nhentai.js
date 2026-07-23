@@ -7,12 +7,12 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.1.0";
+  version = "1.2.0";
 
   minAppVersion = "1.0.0";
 
   // update url
-  url = "https://cdn.jsdelivr.net/gh/haukuen/venera-configs@main/nhentai.js";
+  url = "https://cdn.jsdelivr.net/gh/opaiopaio/venera-configs@main/nhentai.js";
 
   baseUrl = "https://nhentai.net";
   apiBaseUrl = "https://nhentai.net/api/v2";
@@ -118,6 +118,20 @@ class Nhentai extends ComicSource {
         "User-Agent": "Mozilla/5.0",
       },
     };
+  }
+
+  _headers(extra = {}) {
+    let h = {
+      "User-Agent":
+        "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+      Referer: `${this.baseUrl}/`,
+      ...extra,
+    };
+    let apiKey = this.loadSetting("apiKey");
+    if (apiKey) {
+      h["Authorization"] = `Key ${apiKey}`;
+    }
+    return h;
   }
 
   toAbsoluteMediaUrl(path, isThumb = false) {
@@ -477,38 +491,20 @@ class Nhentai extends ComicSource {
     addOrDelFavorite: async (comicId, folderId, isAdding) => {
       comicId = this.normalizeComicId(comicId);
       let v2Url = `${this.apiBaseUrl}/galleries/${comicId}/favorite`;
-      let headers = {
+      let headers = this._headers({
         "X-Requested-With": "XMLHttpRequest",
-      };
+        Referer: `${this.baseUrl}/g/${comicId}/`,
+      });
       let res = isAdding
         ? await Network.post(v2Url, headers, null)
         : await this.deleteWithFallback(v2Url, headers);
-      if (res.status !== 200) {
-        // Fallback to legacy endpoint for cookie-based auth compatibility.
-        let info = await this.comic.loadInfo(comicId);
-        let token = info.csrfToken;
-        let legacyUrl = `${this.baseUrl}/api/gallery/${comicId}/${isAdding ? "favorite" : "unfavorite"}`;
-        let legacyRes = await Network.post(
-          legacyUrl,
-          {
-            "X-CSRFToken": token,
-            Referer: `${this.baseUrl}/g/${comicId}/`,
-            "X-Requested-With": "XMLHttpRequest",
-          },
-          null,
-        );
-        if (legacyRes.status === 200) {
-          return true;
-        }
-        if (legacyRes.status === 401) {
-          throw "Login expired";
-        }
-        throw "Invalid Status Code: " + legacyRes.status;
-      }
       if (res.status === 200) {
         return true;
       }
-      throw "Failed";
+      if (res.status === 401) {
+        throw "Login expired";
+      }
+      throw "Invalid Status Code: " + res.status;
     },
     /**
      * load comics in a folder
@@ -519,13 +515,13 @@ class Nhentai extends ComicSource {
      */
     loadComics: async (page, folder) => {
       let apiUrl = `${this.apiBaseUrl}/favorites?page=${page}`;
-      let apiRes = await Network.get(apiUrl, {});
+      let apiRes = await Network.get(apiUrl, this._headers());
       if (apiRes.status === 200) {
         return this.parseComicListFromApi(JSON.parse(apiRes.body));
       }
 
       let url = `${this.baseUrl}/favorites?page=${page}`;
-      let webRes = await Network.get(url, {});
+      let webRes = await Network.get(url, this._headers());
       if (webRes.status !== 200) {
         if (apiRes.status === 401 || webRes.status === 401) {
           throw "Login expired";
@@ -789,6 +785,17 @@ class Nhentai extends ComicSource {
     enableTagsTranslate: true,
   };
 
+  // [Optional] settings related
+  // Generate an API key at https://nhentai.net/user/settings#apikeys
+  settings = {
+    apiKey: {
+      title: "API Key",
+      type: "input",
+      validator: null,
+      default: "",
+    },
+  };
+
   // [Optional] translations for the strings in this config
   translation = {
     zh_CN: {
@@ -806,6 +813,7 @@ class Nhentai extends ComicSource {
       Groups: "团队",
       Parodies: "原作",
       Categories: "分类",
+      "API Key": "API 密钥",
     },
     zh_TW: {
       Tags: "標籤",
@@ -822,8 +830,11 @@ class Nhentai extends ComicSource {
       Groups: "團隊",
       Parodies: "原作",
       Categories: "分類",
+      "API Key": "API 金鑰",
     },
-    en: {},
+    en: {
+      "API Key": "API Key",
+    },
   };
 
   static nhentaiTags = {
