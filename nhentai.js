@@ -7,7 +7,7 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.2.8";
+  version = "1.2.9";
   // CDN cache bust
 
   minAppVersion = "1.0.0";
@@ -148,6 +148,15 @@ class Nhentai extends ComicSource {
       h["Authorization"] = `Key ${apiKey}`;
     }
     return h;
+  }
+
+  _webHeaders(extra = {}) {
+    return {
+      "User-Agent":
+        "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+      Referer: `/`,
+      ...extra,
+    };
   }
 
   toAbsoluteMediaUrl(path, isThumb = false) {
@@ -333,7 +342,7 @@ class Nhentai extends ComicSource {
         if (page && page !== 1) {
           url = `${url}?page=${page}`;
         }
-        let res = await Network.get(url, this._headers());
+        let res = await Network.get(url, this._webHeaders());
         if (res.status !== 200) {
           throw "Invalid Status Code: " + res.status;
         }
@@ -436,7 +445,7 @@ class Nhentai extends ComicSource {
       let sort = (options[0] || "popular").replaceAll("@", "-");
       category = category.replaceAll(".", "-");
       let url = `${this.baseUrl}/${param}/${encodeURIComponent(category)}${sort}?page=${page}`;
-      let res = await Network.get(url, this._headers());
+      let res = await Network.get(url, this._webHeaders());
       return this.parseComicList(res.body, "category");
     },
     // provide options for category comic loading
@@ -537,7 +546,7 @@ class Nhentai extends ComicSource {
       }
 
       let url = `${this.baseUrl}/favorites?page=${page}`;
-      let webRes = await Network.get(url, this._headers());
+      let webRes = await Network.get(url, this._webHeaders());
       if (webRes.status !== 200) {
         if (apiRes.status === 401 || webRes.status === 401) {
           throw "Login expired";
@@ -633,7 +642,7 @@ class Nhentai extends ComicSource {
         return comic;
       }
 
-      let res = await Network.get(`${this.baseUrl}/g/${id}/`, {});
+      let res = await Network.get(`${this.baseUrl}/g/${id}/`, this._webHeaders());
       if (res.status !== 200) {
         throw "Invalid Status Code: " + res.status;
       }
