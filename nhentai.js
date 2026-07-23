@@ -7,7 +7,7 @@ class Nhentai extends ComicSource {
   // unique id of the source
   key = "nhentai";
 
-  version = "1.2.5";
+  version = "1.2.6";
   // CDN cache bust
 
   minAppVersion = "1.0.0";
@@ -813,9 +813,26 @@ class Nhentai extends ComicSource {
     getApiKey: {
       title: "Get API Key",
       type: "callback",
-      buttonText: "Open API Key Page",
+      buttonText: "Get API Key",
       callback: () => {
-        UI.launchUrl("https://nhentai.net/user/settings");
+        UI.showDialog(
+          "How to Get API Key",
+          this.loadSetting("getApiKeyTutorial") ||
+            "1. Login to your account<br>2. Click your avatar<br>3. Click Settings<br>4. Scroll down to create API Key<br>5. Copy the API Key and come back to login",
+          [
+            {
+              text: "Open Website",
+              callback: () => {
+                UI.launchUrl("https://nhentai.net/login/?next=/user/settings");
+              },
+              style: "filled",
+            },
+            {
+              text: "Close",
+              style: "text",
+            },
+          ],
+        );
       },
     },
   };
