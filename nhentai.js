@@ -815,23 +815,23 @@ class Nhentai extends ComicSource {
       type: "callback",
       buttonText: "Get API Key",
       callback: () => {
-        UI.showDialog(
-          "How to Get API Key",
-          "1. Login to your account<br>2. Click your avatar<br>3. Click Settings<br>4. Scroll down to create API Key<br>5. Copy the API Key and come back to login",
-          [
-            {
-              text: "Open Website",
-              callback: () => {
-                UI.launchUrl("https://nhentai.net/login/?next=/user/settings");
-              },
-              style: "filled",
+        let isCN = APP.locale && APP.locale.startsWith("zh");
+        let title = isCN ? "如何获取 API Key" : "How to Get API Key";
+        let content = isCN
+          ? "<b>1.</b> 登录你的账号<br><br><b>2.</b> 点击右上角头像<br><br><b>3.</b> 点击「设置」(Settings)<br><br><b>4.</b> 下滑找到 API Key 区域，点击创建<br><br><b>5.</b> 复制 API Key，返回此处登录填写"
+          : "<b>1.</b> Login to your account<br><br><b>2.</b> Click your avatar<br><br><b>3.</b> Click Settings<br><br><b>4.</b> Scroll down to API Key section and create one<br><br><b>5.</b> Copy the API Key and come back to login";
+        let openText = isCN ? "打开网页" : "Open Website";
+        let closeText = isCN ? "关闭" : "Close";
+        UI.showDialog(title, content, [
+          {
+            text: openText,
+            callback: () => {
+              UI.launchUrl("https://nhentai.net/login/?next=/user/settings");
             },
-            {
-              text: "Close",
-              style: "text",
-            },
-          ],
-        );
+            style: "filled",
+          },
+          { text: closeText, style: "text" },
+        ]);
       },
     },
   };
