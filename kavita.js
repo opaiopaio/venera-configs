@@ -4,7 +4,7 @@ class Kavita extends ComicSource {
 
   key = "kavita";
 
-  version = "1.0.0";
+  version = "1.1.0";
 
   minAppVersion = "1.4.0";
 
@@ -99,6 +99,12 @@ class Kavita extends ComicSource {
     ReadLast: 32,
     FileSize: 33,
   };
+
+  // 漫画服务器存的是 Epub(3)/Pdf(4) 等书籍格式，无法在阅读器里正常阅读，统一排除
+  excludedFormats = [3, 4];
+
+  // 书籍类库类型（Book=2, LightNovel=4），不作为分类展示
+  excludedLibraryTypes = [2, 4];
 
   // [Optional] account related
   account = {
@@ -589,25 +595,42 @@ class Kavita extends ComicSource {
     const last = this.loadData("kavita_meta_ts");
     if (!force && last && now - last < 5 * 60 * 1000) return;
     try {
-      const [libraries, genres, authors] = await Promise.all([
-        this.getJson("/api/Library/libraries"),
-        this.getJson("/api/Metadata/genres"),
-        this.getJson("/api/metadata/people-by-role?role=3"),
-      ]);
+      const libraries = await this.getJson("/api/Library/libraries");
       const libraryList = Array.isArray(libraries)
-        ? libraries.filter((library) => library && library.id)
+        ? libraries.filter(
+            (library) =>
+              library &&
+              library.id &&
+              !this.excludedLibraryTypes.includes(library.type),
+          )
         : [];
       this.saveData(
         "kavita_libraries",
         libraryList.map((item) => ({ id: item.id, name: item.name })),
       );
+
+      // 题材/作者仅从漫画类书库聚合，避免书籍库的题材、作者混入分类页
+      const libraryIds = libraryList.map((item) => item.id);
+      const libraryQuery = libraryIds.length
+        ? { libraryIds: libraryIds.join(",") }
+        : null;
+      const [genres, people] = await Promise.all([
+        this.getJson("/api/Metadata/genres", libraryQuery),
+        this.getJson("/api/metadata/people", libraryQuery),
+      ]);
       this.saveData("kavita_genres", Array.isArray(genres) ? genres : []);
-      this.saveData(
-        "kavita_authors",
-        Array.isArray(authors)
-          ? authors.map((item) => ({ id: item.id, name: item.name }))
-          : [],
-      );
+
+      const authors = [];
+      for (const person of Array.isArray(people) ? people : []) {
+        if (!person || !person.id) continue;
+        const roles = await this.getJson("/api/person/roles", {
+          personId: person.id,
+        });
+        if (Array.isArray(roles) && roles.includes(3)) {
+          authors.push({ id: person.id, name: person.name });
+        }
+      }
+      this.saveData("kavita_authors", authors);
       this.saveData("kavita_meta_ts", now);
     } catch (error) {
       this.saveData("kavita_libraries", []);
@@ -618,6 +641,15 @@ class Kavita extends ComicSource {
   }
 
   async fetchSeriesList(path, query, data) {
+    data = data || {};
+    data.statements = [
+      ...(data.statements || []),
+      {
+        comparison: this.FilterComparison.NotContains,
+        field: this.FilterField.Formats,
+        value: this.excludedFormats.join(","),
+      },
+    ];
     const { content, page } = await this.postJson(path, query, data);
     const series = Array.isArray(content) ? content : [];
     const apiKey = this.loadData("apiKey");
