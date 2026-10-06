@@ -8,7 +8,7 @@ class Nhentai extends ComicSource {
   key = "nhentai";
 
   version = "1.3.0";
-  // CDN cache bust 
+  // CDN cache bust
 
   minAppVersion = "1.0.0";
 
@@ -27,14 +27,11 @@ class Nhentai extends ComicSource {
       validate: async (values) => {
         let apiKey = values[0];
         if (!apiKey) return false;
-        let res = await Network.get(
-          `${this.apiBaseUrl}/favorites?page=1`,
-          {
-            "User-Agent":
-              "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
-            Authorization: `Key ${apiKey}`,
-          },
-        );
+        let res = await Network.get(`${this.apiBaseUrl}/favorites?page=1`, {
+          "User-Agent":
+            "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+          Authorization: `Key ${apiKey}`,
+        });
         if (res.status === 200) {
           this.saveData("apiKey", apiKey);
           return true;
@@ -653,7 +650,10 @@ class Nhentai extends ComicSource {
         return comic;
       }
 
-      let res = await Network.get(`${this.baseUrl}/g/${id}/`, this._webHeaders());
+      let res = await Network.get(
+        `${this.baseUrl}/g/${id}/`,
+        this._webHeaders(),
+      );
       if (res.status !== 200) {
         throw "Invalid Status Code: " + res.status;
       }
